@@ -1,7 +1,3 @@
-/*
-Author: jw
-用途: 定义 ChainForge 的 Docker 构建和运行环境
-*/
 FROM golang:1.22 AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
