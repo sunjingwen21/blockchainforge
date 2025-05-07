@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChainForge</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.8/dist/axios.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+/*
+Author: jw
+用途: ChainForge 的前端界面，使用 React 实现 RPC 和全节点管理的交互页面
+*/
+        const { useState, useEffect } = React;
+
+        const App = () => {
+            const [page, setPage] = useState('rpcs');
+            const [rpcs, setRPCs] = useState([]);
+            const [nodes, setNodes] = useState([]);
+            const [newRPC, setNewRPC] = useState({ url: '', chain_id: '', status: '活跃' });
+            const [newNode, setNewNode] = useState({ chain: '', status: '运行中', sync_status: '已同步' });
+
+            useEffect(() => {
+                fetchRPCs();
+                fetchNodes();
+            }, []);
+
+            const fetchRPCs = async () => {
+                const response = await axios.get('/api/rpcs');
+                setRPCs(response.data);
+            };
+
+            const fetchNodes = async () => {
+                const response = await axios.get('/api/nodes');
+                setNodes(response.data);
+            };
+
+            const addRPC = async () => {
+                await axios.post('/api/rpcs', newRPC);
+                setNewRPC({ url: '', chain_id: '', status: '活跃' });
+                fetchRPCs();
+            };
+
+            const deleteRPC = async (id) => {
+                await axios.delete(`/api/rpcs/${id}`);
+                fetchRPCs();
+            };
+
+            const addNode = async () => {
+                await axios.post('/api/nodes', newNode);
+                setNewNode({ chain: '', status: '运行中', sync_status: '已同步' });
+                fetchNodes();
+            };
+
+            const deleteNode = async (id) => {
+                await axios.delete(`/api/nodes/${id}`);
+                fetchNodes();
+            };
+
+            return (
+                <div className="flex h-screen">
+                    <div className="w-64 bg-gray-800 text-white p-4">
+                        <h1 className="text-2xl font-bold mb-6">ChainForge</h1>
+                        <ul>
+                            <li
+                                className={`p-2 cursor-pointer ${page === 'rpcs' ? 'bg-gray-600' : ''}`}
+                                onClick={() => setPage('rpcs')}
+                            >
+                                RPC 管理
+                            </li>
+                            <li
+                                className={`p-2 cursor-pointer ${page === 'nodes' ? 'bg-gray-600' : ''}`}
+                                onClick={() => setPage('nodes')}
+                            >
+                                全节点管理
+                            </li>
+                        </ul>
+                    </div>
+                    <div className="flex-1 p-6 bg-gray-100">
+                        {page === 'rpcs' && (
+                            <div>
+                                <h2 className="text-xl font-bold mb-4">RPC 管理</h2>
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        placeholder="RPC 地址"
+                                        value={newRPC.url}
+                                        onChange={(e) => setNewRPC({ ...newRPC, url: e.target.value })}
+                                        className="p-2 border rounded mr-2"
+                                    />
+                                    <input
+                                        type="number"
+                                        placeholder="链 ID"
+                                        value={newRPC.chain_id}
+                                        onChange={(e) => setNewRPC({ ...newRPC, chain_id: e.target.value })}
+                                        className="p-2 border rounded mr-2"
+                                    />
+                                    <button
+                                        onClick={addRPC}
+                                        className="bg-blue-500 text-white p-2 rounded"
+                                    >
+                                        添加 RPC
+                                    </button>
+                                </div>
+                                <table className="w-full border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-200">
+                                            <th className="p-2">ID</th>
+                                            <th className="p-2">地址</th>
+                                            <th className="p-2">链 ID</th>
+                                            <th className="p-2">状态</th>
+                                            <th className="p-2">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {rpcs.map(rpc => (
+                                            <tr key={rpc.id} className="border-t">
+                                                <td className="p-2">{rpc.id}</td>
+                                                <td className="p-2">{rpc.url}</td>
+                                                <td className="p-2">{rpc.chain_id}</td>
+                                                <td className="p-2">{rpc.status}</td>
+                                                <td className="p-2">
+                                                    <button
+                                                        onClick={() => deleteRPC(rpc.id)}
+                                                        className="bg-red-500 text-white p-1 rounded"
+                                                    >
+                                                        删除
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        {page === 'nodes' && (
+                            <div>
+                                <h2 className="text-xl font-bold mb-4">全节点管理</h2>
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        placeholder="链（如 Ethereum）"
+                                        value={newNode.chain}
+                                        onChange={(e) => setNewNode({ ...newNode, chain: e.target.value })}
+                                        className="p-2 border rounded mr-2"
+                                    />
+                                    <button
+                                        onClick={addNode}
+                                        className="bg-blue-500 text-white p-2 rounded"
+                                    >
+                                        添加节点
+                                    </button>
+                                </div>
+                                <table className="w-full border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-200">
+                                            <th className="p-2">ID</th>
+                                            <th className="p-2">链</th>
+                                            <th className="p-2">状态</th>
+                                            <th className="p-2">同步状态</th>
+                                            <th className="p-2">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {nodes.map(node => (
+                                            <tr key={node.id} className="border-t">
+                                                <td className="p-2">{node.id}</td>
+                                                <td className="p-2">{node.chain}</td>
+                                                <td className="p-2">{node.status}</td>
+                                                <td className="p-2">{node.sync_status}</td>
+                                                <td className="p-2">
+                                                    <button
+                                                        onClick={() => deleteNode(node.id)}
+                                                        className="bg-red-500 text-white p-1 rounded"
+                                                    >
+                                                        删除
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html> 
