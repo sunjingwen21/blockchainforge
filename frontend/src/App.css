@@ -1,0 +1,27 @@
+.layout {
+  min-height: 100vh;
+}
+
+.logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.site-layout-content {
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
+}
+
+.ant-layout-header {
+  background: #001529;
+}
+
+.ant-layout-footer {
+  background: #f0f2f5;
+} 
