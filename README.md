@@ -104,3 +104,8 @@ kubectl apply -f k8s/
 4. 推送分支：`git push origin feature/你的功能`
 5. 提交 Pull Request
 
+## 📬 联系方式
+
+- 📧 邮箱：sunjingwen0112@gmail.com
+
+欢迎通过以上方式联系我，我会尽快回复您的问题和建议。
