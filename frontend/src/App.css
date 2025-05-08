@@ -2,14 +2,21 @@
   min-height: 100vh;
 }
 
+.header-flex {
+  display: flex;
+  align-items: center;
+}
+
 .logo {
-  float: left;
-  width: 120px;
+  float: none;
+  width: 180px;
   height: 31px;
-  margin: 16px 24px 16px 0;
+  margin: 16px 24px 16px 32px;
   color: white;
-  font-size: 20px;
+  font-size: 28px;
   font-weight: bold;
+  display: flex;
+  align-items: center;
 }
 
 .site-layout-content {

@@ -23,8 +23,10 @@ const menuItems = [
 function Dashboard() {
   return <h2>仪表盘：可视化性能指标、实时告警和日志分析</h2>;
 }
+
+// 这里先留空，下一步实现RPC端点管理页面
 function RpcEndpoints() {
-  return <h2>RPC 端点管理：添加、更新、删除区块链 RPC 端点，实时监控健康状态、延迟与错误率</h2>;
+  return <div id="rpc-endpoints-page"></div>;
 }
 function FullNodes() {
   return <h2>全节点管理：自动化部署与管理区块链全节点，监控节点同步状态与区块高度</h2>;
@@ -46,15 +48,17 @@ function App() {
   const location = useLocation();
   return (
     <Layout className="layout">
-      <Header>
-        <div className="logo">BlockchainForge</div>
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectedKeys={[location.pathname === '/' ? '/' : location.pathname]}
-          items={menuItems}
-          style={{ lineHeight: '64px' }}
-        />
+      <Header style={{ padding: 0 }}>
+        <div className="header-flex">
+          <div className="logo">BlockchainForge</div>
+          <Menu
+            theme="dark"
+            mode="horizontal"
+            selectedKeys={[location.pathname === '/' ? '/' : location.pathname]}
+            items={menuItems}
+            style={{ lineHeight: '64px', borderBottom: 'none' }}
+          />
+        </div>
       </Header>
       <Content style={{ padding: '0 50px' }}>
         <div className="site-layout-content">
