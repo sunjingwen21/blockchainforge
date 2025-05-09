@@ -1,13 +1,74 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-} 
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #e5e7eb;
+}
+
+tr {
+    border-top: 1px solid #d1d5db;
+}
+
+button {
+    cursor: pointer;
+}
+
+.sidebar {
+    background-color: #2d3748;
+    color: white;
+    padding: 16px;
+}
+
+.sidebar ul li {
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.sidebar ul li.active {
+    background-color: #4b5563;
+}
+
+.content {
+    flex: 1;
+    padding: 24px;
+    background-color: #f3f4f6;
+    min-height: 100vh;
+}
+
+.input-field {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.select-field {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    width: 128px;
+}
+
+canvas {
+    margin-top: 16px;
+    max-width: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.hidden {
+    display: none;
+}

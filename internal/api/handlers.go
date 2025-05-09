@@ -1,7 +1,3 @@
-/*
-Author: jw
-用途: 定义 ChainForge 的 API 处理逻辑，包括 RPC 和节点管理的增删查操作
-*/
 package api
 
 import (

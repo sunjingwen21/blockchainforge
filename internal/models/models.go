@@ -1,6 +1,6 @@
 /*
 Author: jw
-用途: 定义 ChainForge 的数据模型，包括 RPC 和节点的数据结构
+用途: 定义 BlockChainForge 的数据模型，包括 RPC 和节点的数据结构
 */
 package models
 
