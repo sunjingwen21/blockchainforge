@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// 加载配置文件
-	cfg, err := config.LoadConfig("config/config.yaml")
+	cfg, err := config.LoadConfig("config.yaml")
 	if err != nil {
 		log.Fatal("加载配置文件失败:", err)
 	}
