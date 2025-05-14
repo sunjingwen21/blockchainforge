@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Chart from 'chart.js/auto';
 
 const App = () => {
     const [page, setPage] = useState('dashboard');
@@ -11,7 +12,8 @@ const App = () => {
     const [newNode, setNewNode] = useState({ chain: '', status: '运行中', sync_status: '已同步' });
     const [isLoading, setIsLoading] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const canvasRef = useRef(null);
+    const chartRef = useRef(null);
+    const chartInstanceRef = useRef(null);
 
     useEffect(() => {
         fetchRPCs();
@@ -19,17 +21,20 @@ const App = () => {
     }, []);
 
     useEffect(() => {
-        if (page === 'dashboard' && canvasRef.current) {
+        if (page === 'dashboard' && chartRef.current) {
             drawChart();
         }
+        return () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.destroy();
+            }
+        };
     }, [page, rpcs, nodes]);
 
     const fetchRPCs = async () => {
         setIsLoading(true);
         try {
-            console.log('Sending request to /rpc/api/rpcs');
             const response = await axios.get('/rpc/api/rpcs');
-            console.log('RPCs Response:', response.data);
             setRPCs(response.data || []);
         } catch (error) {
             console.error('获取 RPC 列表失败:', error);
@@ -43,9 +48,7 @@ const App = () => {
     const fetchNodes = async () => {
         setIsLoading(true);
         try {
-            console.log('Sending request to /rpc/api/nodes');
             const response = await axios.get('/rpc/api/nodes');
-            console.log('Nodes Response:', response.data);
             setNodes(response.data || []);
         } catch (error) {
             console.error('获取节点列表失败:', error);
@@ -137,39 +140,65 @@ const App = () => {
     };
 
     const drawChart = () => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         const rpcStatusCount = { 活跃: 0, 离线: 0, 故障: 0 };
         const nodeStatusCount = { 运行中: 0, 已停止: 0, 错误: 0 };
         rpcs.forEach(rpc => rpcStatusCount[rpc.status] = (rpcStatusCount[rpc.status] || 0) + 1);
         nodes.forEach(node => nodeStatusCount[node.status] = (nodeStatusCount[node.status] || 0) + 1);
 
-        const barWidth = 50;
-        const spacing = 20;
-        const startX = 30;
-        let x = startX;
+        if (chartInstanceRef.current) {
+            chartInstanceRef.current.destroy();
+        }
 
-        ctx.fillStyle = '#3b82f6';
-        Object.entries(rpcStatusCount).forEach(([status, count], index) => {
-            const height = count * 20;
-            ctx.fillRect(x, canvas.height - height - 30, barWidth, height);
-            ctx.fillStyle = '#000';
-            ctx.fillText(status, x, canvas.height - 10);
-            ctx.fillText(count, x + barWidth / 2 - 5, canvas.height - height - 40);
-            x += barWidth + spacing;
-        });
-
-        x += 50;
-        ctx.fillStyle = '#10b981';
-        Object.entries(nodeStatusCount).forEach(([status, count], index) => {
-            const height = count * 20;
-            ctx.fillRect(x, canvas.height - height - 30, barWidth, height);
-            ctx.fillStyle = '#000';
-            ctx.fillText(status, x, canvas.height - 10);
-            ctx.fillText(count, x + barWidth / 2 - 5, canvas.height - height - 40);
-            x += barWidth + spacing;
+        const ctx = chartRef.current.getContext('2d');
+        chartInstanceRef.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['活跃', '离线', '故障', '运行中', '已停止', '错误'],
+                datasets: [
+                    {
+                        label: 'RPC 状态',
+                        data: [rpcStatusCount['活跃'], rpcStatusCount['离线'], rpcStatusCount['故障'], 0, 0, 0],
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1,
+                    },
+                    {
+                        label: '节点状态',
+                        data: [0, 0, 0, nodeStatusCount['运行中'], nodeStatusCount['已停止'], nodeStatusCount['错误']],
+                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '数量',
+                        },
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '状态',
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: '状态分布图',
+                    },
+                },
+            },
         });
     };
 
@@ -212,6 +241,31 @@ const App = () => {
                         全节点管理
                     </li>
                 </ul>
+                <div className="mt-6">
+                        <tbody>
+                        <tr>
+                            <td>RPC</td>
+                            <td>{rpcs.length}</td>
+                            <td>
+                                {Object.entries(rpcs.reduce((acc, rpc) => {
+                                    acc[rpc.status] = (acc[rpc.status] || 0) + 1;
+                                    return acc;
+                                }, {})).map(([status, count]) => `${status}: ${count}`).join(', ')}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>节点</td>
+                            <td>{nodes.length}</td>
+                            <td>
+                                {Object.entries(nodes.reduce((acc, node) => {
+                                    acc[node.status] = (acc[node.status] || 0) + 1;
+                                    return acc;
+                                }, {})).map(([status, count]) => `${status}: ${count}`).join(', ')}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div className="content">
                 <button
@@ -227,214 +281,10 @@ const App = () => {
                         <h2 className="text-xl font-bold mb-4" style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '16px' }}>
                             仪表盘
                         </h2>
-                        <div className="mb-4">
-                            <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '8px' }}>统计数据</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>类型</th>
-                                        <th>总数</th>
-                                        <th>状态分布</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>RPC</td>
-                                        <td>{rpcs.length}</td>
-                                        <td>
-                                            {Object.entries(rpcs.reduce((acc, rpc) => {
-                                                acc[rpc.status] = (acc[rpc.status] || 0) + 1;
-                                                return acc;
-                                            }, {})).map(([status, count]) => `${status}: ${count}`).join(', ')}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>节点</td>
-                                        <td>{nodes.length}</td>
-                                        <td>
-                                            {Object.entries(nodes.reduce((acc, node) => {
-                                                acc[node.status] = (acc[node.status] || 0) + 1;
-                                                return acc;
-                                            }, {})).map(([status, count]) => `${status}: ${count}`).join(', ')}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
                         <div>
-                            <h3 style={{ fontSize: '1rem', fontWeight: 'bold', marginBottom: '8px' }}>状态分布图</h3>
-                            <canvas ref={canvasRef} width="800" height="300"></canvas>
-                        </div>
-                    </div>
-                )}
-                {page === 'rpcs' && (
-                    <div>
-                        <h2 className="text-xl font-bold mb-4" style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '16px' }}>
-                            RPC 管理
-                        </h2>
-                        <div className="mb-4 flex flex-wrap gap-2" style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                            <input
-                                type="text"
-                                placeholder="RPC 地址"
-                                value={newRPC.url}
-                                onChange={(e) => setNewRPC({ ...newRPC, url: e.target.value })}
-                                className="input-field"
-                                disabled={isLoading}
-                            />
-                            <input
-                                type="number"
-                                placeholder="链 ID"
-                                value={newRPC.chain_id}
-                                onChange={(e) => setNewRPC({ ...newRPC, chain_id: e.target.value })}
-                                className="input-field"
-                                style={{ width: '96px' }}
-                                disabled={isLoading}
-                            />
-                            <select
-                                value={newRPC.status}
-                                onChange={(e) => setNewRPC({ ...newRPC, status: e.target.value })}
-                                className="select-field"
-                                disabled={isLoading}
-                            >
-                                <option value="活跃">活跃</option>
-                                <option value="离线">离线</option>
-                                <option value="故障">故障</option>
-                            </select>
-                            <button
-                                onClick={addRPC}
-                                className="bg-blue-500 text-white p-2 rounded disabled:bg-gray-400 min-w-[100px]"
-                                style={{ backgroundColor: '#3b82f6', color: 'white', padding: '8px', borderRadius: '4px', minWidth: '100px' }}
-                                disabled={isLoading}
-                            >
-                                添加 RPC
-                            </button>
-                        </div>
-                        <div className="overflow-x-auto" style={{ overflowX: 'auto' }}>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>地址</th>
-                                        <th>链 ID</th>
-                                        <th>状态</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {rpcs.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="5" style={{ padding: '8px', textAlign: 'center', color: '#6b7280' }}>
-                                                暂无 RPC 数据
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        rpcs.map(rpc => (
-                                            <tr key={rpc.id}>
-                                                <td>{rpc.id}</td>
-                                                <td>{rpc.url}</td>
-                                                <td>{rpc.chain_id}</td>
-                                                <td>{rpc.status}</td>
-                                                <td>
-                                                    <button
-                                                        onClick={() => deleteRPC(rpc.id)}
-                                                        className="bg-red-500 text-white p-1 rounded disabled:bg-gray-400 min-w-[60px]"
-                                                        style={{ backgroundColor: '#ef4444', color: 'white', padding: '4px', borderRadius: '4px', minWidth: '60px' }}
-                                                        disabled={isLoading}
-                                                    >
-                                                        删除
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                )}
-                {page === 'nodes' && (
-                    <div>
-                        <h2 className="text-xl font-bold mb-4" style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '16px' }}>
-                            全节点管理
-                        </h2>
-                        <div className="mb-4 flex flex-wrap gap-2" style={{ marginBottom: '16px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                            <input
-                                type="text"
-                                placeholder="链（如 Ethereum）"
-                                value={newNode.chain}
-                                onChange={(e) => setNewNode({ ...newNode, chain: e.target.value })}
-                                className="input-field"
-                                disabled={isLoading}
-                            />
-                            <select
-                                value={newNode.status}
-                                onChange={(e) => setNewNode({ ...newNode, status: e.target.value })}
-                                className="select-field"
-                                disabled={isLoading}
-                            >
-                                <option value="运行中">运行中</option>
-                                <option value="已停止">已停止</option>
-                                <option value="错误">错误</option>
-                            </select>
-                            <select
-                                value={newNode.sync_status}
-                                onChange={(e) => setNewNode({ ...newNode, sync_status: e.target.value })}
-                                className="select-field"
-                                disabled={isLoading}
-                            >
-                                <option value="已同步">已同步</option>
-                                <option value="同步中">同步中</option>
-                                <option value="未同步">未同步</option>
-                            </select>
-                            <button
-                                onClick={addNode}
-                                className="bg-blue-500 text-white p-2 rounded disabled:bg-gray-400 min-w-[100px]"
-                                style={{ backgroundColor: '#3b82f6', color: 'white', padding: '8px', borderRadius: '4px', minWidth: '100px' }}
-                                disabled={isLoading}
-                            >
-                                添加节点
-                            </button>
-                        </div>
-                        <div className="overflow-x-auto" style={{ overflowX: 'auto' }}>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>链</th>
-                                        <th>状态</th>
-                                        <th>同步状态</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {nodes.length === 0 ? (
-                                        <tr>
-                                            <td colSpan="5" style={{ padding: '8px', textAlign: 'center', color: '#6b7280' }}>
-                                                暂无节点数据
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        nodes.map(node => (
-                                            <tr key={node.id}>
-                                                <td>{node.id}</td>
-                                                <td>{node.chain}</td>
-                                                <td>{node.status}</td>
-                                                <td>{node.sync_status}</td>
-                                                <td>
-                                                    <button
-                                                        onClick={() => deleteNode(node.id)}
-                                                        className="bg-red-500 text-white p-1 rounded disabled:bg-gray-400 min-w-[60px]"
-                                                        style={{ backgroundColor: '#ef4444', color: 'white', padding: '4px', borderRadius: '4px', minWidth: '60px' }}
-                                                        disabled={isLoading}
-                                                    >
-                                                        删除
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                            <div style={{ height: '400px', width: '100%' }}>
+                                <canvas ref={chartRef}></canvas>
+                            </div>
                         </div>
                     </div>
                 )}
