@@ -31,15 +31,17 @@ const App = () => {
         };
     }, [page, rpcs, nodes]);
 
+    // 更新接口路径，符合后端提供的 API 路由
     const fetchRPCs = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get('/rpc/api/rpcs');
-            setRPCs(response.data || []);
+            const response = await axios.get('/api/rpcs');
+            console.log("Fetched RPCs:", response.data);  // 输出数据，检查其格式
+            setRPCs(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('获取 RPC 列表失败:', error);
             toast.error('无法获取 RPC 列表，请检查后端或网络');
-            setRPCs([]);
+            setRPCs([]);  // 初始化为空数组
         } finally {
             setIsLoading(false);
         }
@@ -48,12 +50,13 @@ const App = () => {
     const fetchNodes = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get('/rpc/api/nodes');
-            setNodes(response.data || []);
+            const response = await axios.get('/api/nodes');
+            console.log("Fetched Nodes:", response.data);  // 输出数据，检查其格式
+            setNodes(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('获取节点列表失败:', error);
             toast.error('无法获取节点列表，请检查后端或网络');
-            setNodes([]);
+            setNodes([]);  // 初始化为空数组
         } finally {
             setIsLoading(false);
         }
@@ -75,7 +78,7 @@ const App = () => {
         }
         setIsLoading(true);
         try {
-            await axios.post('/rpc/api/rpcs', sanitizedRPC);
+            await axios.post('/api/rpcs', sanitizedRPC);
             setNewRPC({ url: '', chain_id: '', status: '活跃' });
             fetchRPCs();
             toast.success('RPC 添加成功');
@@ -90,7 +93,7 @@ const App = () => {
     const deleteRPC = async (id) => {
         setIsLoading(true);
         try {
-            await axios.delete(`/rpc/api/rpcs/${id}`);
+            await axios.delete(`/api/rpcs/${id}`);
             fetchRPCs();
             toast.success('RPC 删除成功');
         } catch (error) {
@@ -113,7 +116,7 @@ const App = () => {
         }
         setIsLoading(true);
         try {
-            await axios.post('/rpc/api/nodes', sanitizedNode);
+            await axios.post('/api/nodes', sanitizedNode);
             setNewNode({ chain: '', status: '运行中', sync_status: '已同步' });
             fetchNodes();
             toast.success('节点添加成功');
@@ -128,7 +131,7 @@ const App = () => {
     const deleteNode = async (id) => {
         setIsLoading(true);
         try {
-            await axios.delete(`/rpc/api/nodes/${id}`);
+            await axios.delete(`/api/nodes/${id}`);
             fetchNodes();
             toast.success('节点删除成功');
         } catch (error) {
@@ -142,8 +145,15 @@ const App = () => {
     const drawChart = () => {
         const rpcStatusCount = { 活跃: 0, 离线: 0, 故障: 0 };
         const nodeStatusCount = { 运行中: 0, 已停止: 0, 错误: 0 };
-        rpcs.forEach(rpc => rpcStatusCount[rpc.status] = (rpcStatusCount[rpc.status] || 0) + 1);
-        nodes.forEach(node => nodeStatusCount[node.status] = (nodeStatusCount[node.status] || 0) + 1);
+
+        // 确保 rpcs 和 nodes 是数组类型
+        if (Array.isArray(rpcs)) {
+            rpcs.forEach(rpc => rpcStatusCount[rpc.status] = (rpcStatusCount[rpc.status] || 0) + 1);
+        }
+
+        if (Array.isArray(nodes)) {
+            nodes.forEach(node => nodeStatusCount[node.status] = (nodeStatusCount[node.status] || 0) + 1);
+        }
 
         if (chartInstanceRef.current) {
             chartInstanceRef.current.destroy();
@@ -209,9 +219,7 @@ const App = () => {
                     isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
                 } md:static md:transform-none md:w-1/5 transition-transform duration-200 z-50`}
             >
-                <h1 className="text-2xl font-bold mb-6" style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>
-                    BlockChainForge
-                </h1>
+                <h1 className="text-2xl font-bold mb-6">BlockChainForge</h1>
                 <ul>
                     <li
                         className={`cursor-pointer rounded ${page === 'dashboard' ? 'active' : ''}`}
@@ -241,50 +249,15 @@ const App = () => {
                         全节点管理
                     </li>
                 </ul>
-                <div className="mt-6">
-                        <tbody>
-                        <tr>
-                            <td>RPC</td>
-                            <td>{rpcs.length}</td>
-                            <td>
-                                {Object.entries(rpcs.reduce((acc, rpc) => {
-                                    acc[rpc.status] = (acc[rpc.status] || 0) + 1;
-                                    return acc;
-                                }, {})).map(([status, count]) => `${status}: ${count}`).join(', ')}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>节点</td>
-                            <td>{nodes.length}</td>
-                            <td>
-                                {Object.entries(nodes.reduce((acc, node) => {
-                                    acc[node.status] = (acc[node.status] || 0) + 1;
-                                    return acc;
-                                }, {})).map(([status, count]) => `${status}: ${count}`).join(', ')}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
             <div className="content">
-                <button
-                    className="md:hidden p-2 bg-gray-800 text-white rounded mb-4 min-w-[100px]"
-                    style={{ backgroundColor: '#2d3748', color: 'white', padding: '8px', borderRadius: '4px', marginBottom: '16px', minWidth: '100px' }}
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                >
-                    {isSidebarOpen ? '关闭菜单' : '打开菜单'}
-                </button>
+
                 {isLoading && <div style={{ textAlign: 'center', color: '#4b5563' }}>加载中...</div>}
                 {page === 'dashboard' && (
                     <div>
-                        <h2 className="text-xl font-bold mb-4" style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '16px' }}>
-                            仪表盘
-                        </h2>
-                        <div>
-                            <div style={{ height: '400px', width: '100%' }}>
-                                <canvas ref={chartRef}></canvas>
-                            </div>
+                        <h2 className="text-xl font-bold mb-4">仪表盘</h2>
+                        <div style={{ height: '400px', width: '100%' }}>
+                            <canvas ref={chartRef}></canvas>
                         </div>
                     </div>
                 )}
