@@ -7,29 +7,35 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
+	"os"
 )
 
 func main() {
 	// 加载配置文件
-	cfg, err := config.LoadConfig("config.yaml")
+	env := os.Getenv("ENV")
+	if env == "dev" {
+		cfg, err := config.LoadConfig("config-dev.yaml")
+	} else {
+		cfg, err := config.LoadConfig("config.yaml")
+	}
 	if err != nil {
 		log.Fatal("加载配置文件失败:", err)
 	}
 
 	// 初始化数据库
 	var db *storage.DB
-	if cfg.Database.Type == "sqlite3" {
-		db, err = storage.InitDB(cfg.Database.Type, cfg.Database.SQLite.Path, "")
-	} else if cfg.Database.Type == "mysql" {
+	if cfg.DatabaseType == "sqlite3" {
+		db, err = storage.InitDB(cfg.DatabaseType, cfg.SQLitePath, "")
+	} else if cfg.DatabaseType == "mysql" {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-			cfg.Database.MySQL.User,
-			cfg.Database.MySQL.Password,
-			cfg.Database.MySQL.Host,
-			cfg.Database.MySQL.Port,
-			cfg.Database.MySQL.DBName)
-		db, err = storage.InitDB(cfg.Database.Type, "", dsn)
+			cfg.MySQLUser,
+			cfg.MySQLPassword,
+			cfg.MySQLHost,
+			cfg.MySQLPort,
+			cfg.MySQLDBName)
+		db, err = storage.InitDB(cfg.DatabaseType, "", dsn)
 	} else {
-		log.Fatal("不支持的数据库类型:", cfg.Database.Type)
+		log.Fatal("不支持的数据库类型:", cfg.DatabaseType)
 	}
 
 	if err != nil {

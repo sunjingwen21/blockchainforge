@@ -6,25 +6,14 @@ import (
 )
 
 type DatabaseConfig struct {
-	Type  string         `yaml:"type"`
-	SQLite SQLiteConfig  `yaml:"sqlite"`
-	MySQL  MySQLConfig   `yaml:"mysql"`
-}
-
-type SQLiteConfig struct {
-	Path string `yaml:"path"`
-}
-
-type MySQLConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	DBName   string `yaml:"dbname"`
-}
-
-type Config struct {
-	Database DatabaseConfig `yaml:"database"`
+	DatabaseType  string         `yaml:"database_type"`
+	SQLitePath    string         `yaml:"sqlite_path"`
+	MySQLHost     string         `yaml:"mysql_host"`
+	MySQLPort     int            `yaml:"mysql_port"`
+	MySQLUser     string         `yaml:"mysql_user"`
+	MySQLPassword string         `yaml:"mysql_password"`
+	MySQLDBName   string         `yaml:"mysql_dbname"`
+	MachinePlatform string         `yaml:"machine_platform"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -33,15 +22,17 @@ func LoadConfig(path string) (*Config, error) {
 		return nil, err
 	}
 
-	var config Config
+	var config DatabaseConfig
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		return nil, err
 	}
 
+	return &config, nil
+
 	// 优先使用环境变量 DB_PATH（与 docker-compose.yml 兼容）
 	if dbPath := os.Getenv("DB_PATH"); dbPath != "" {
-		config.Database.SQLite.Path = dbPath
+		config.DatabaseType = dbPath
 	}
 
-	return &config, nil
+
 }

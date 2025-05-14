@@ -1,4 +1,4 @@
-database_type: sqlite3
+database: mysql
 sqlite_path: /app/data/chainforge.db
 mysql_host: localhost
 mysql_port: 3306

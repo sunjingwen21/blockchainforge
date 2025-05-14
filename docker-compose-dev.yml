@@ -4,7 +4,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: backend/Dockerfile.dev
     ports:
       - "8080:8080"
     volumes:
@@ -12,7 +12,9 @@ services:
       - ./config:/app/config
     environment:
       - GIN_MODE=release
+      - ENV=dev
     restart: unless-stopped
+
 
   frontend:
     build:
@@ -35,6 +37,13 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
 
 volumes:
   data:
