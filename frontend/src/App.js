@@ -204,37 +204,28 @@ const App = () => {
     };
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f6fa' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: '#181A20' }}>
             {/* Sider */}
-            <aside style={{ width: 220, background: '#1a2233', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 0 24px 0', boxShadow: '2px 0 8px #f0f1f2' }}>
-                <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18, letterSpacing: 1, borderBottom: '1px solid #232b3b', marginBottom: 8 }}>
-                    <span style={{ color: '#fff' }}>BlockChainForge</span>
-                </div>
+            <aside className="sider-dark">
+                <div className="sider-logo">BlockChainForge</div>
                 <nav style={{ width: '100%' }}>
                     {menuItems.map(item => (
                         <div
                             key={item.key}
                             onClick={() => setPage(item.key)}
-                            style={{
-                                display: 'flex', alignItems: 'center', cursor: 'pointer',
-                                padding: '0 32px', height: 48, fontSize: 16, fontWeight: 500,
-                                background: page === item.key ? '#232b3b' : 'none',
-                                color: page === item.key ? '#40a9ff' : '#fff',
-                                borderLeft: page === item.key ? '4px solid #40a9ff' : '4px solid transparent',
-                                transition: 'all 0.2s',
-                            }}
+                            className={`sider-menu-item${page === item.key ? ' active' : ''}`}
                         >
-                            <span style={{ fontSize: 20, marginRight: 12 }}>{item.icon}</span>
+                            <span className="icon">{item.icon}</span>
                             {item.label}
                         </div>
                     ))}
                 </nav>
             </aside>
             {/* Content */}
-            <main style={{ flex: 1, minHeight: '100vh', background: '#f5f6fa', padding: '32px 40px' }}>
+            <main style={{ flex: 1, minHeight: '100vh', background: '#181A20', padding: '32px 40px' }}>
                 {isLoading && <div style={{ textAlign: 'center', color: '#4b5563' }}>加载中...</div>}
                 {page === 'dashboard' && (
-                    <div style={{ background: '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px #f0f1f2' }}>
+                    <div className="card-dark">
                         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>仪表盘</h2>
                         <div style={{ height: 400, width: '100%' }}>
                             <canvas ref={chartRef}></canvas>
@@ -242,32 +233,32 @@ const App = () => {
                     </div>
                 )}
                 {page === 'nodes' && (
-                    <div style={{ background: '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px #f0f1f2' }}>
+                    <div className="card-dark">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                             <span style={{ fontSize: 22, fontWeight: 600 }}>全节点管理</span>
                             <div>
                                 <button
                                     onClick={() => setAddNodeModal(true)}
-                                    style={{ background: '#40a9ff', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer', marginRight: 12 }}
+                                    className="btn-dark"
                                     disabled={isLoading}
                                 >添加节点</button>
                                 <button
                                     onClick={() => setCreateNodeModal(true)}
-                                    style={{ background: '#52c41a', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                    className="btn-green"
                                     disabled={isLoading}
                                 >创建节点</button>
                             </div>
                         </div>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
+                        <table className="table-dark">
                             <thead>
-                                <tr style={{ background: '#f5f6fa' }}>
-                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>ID</th>
-                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>IP</th>
-                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>端口号</th>
-                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>链</th>
-                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>状态</th>
-                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>同步状态</th>
-                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>操作</th>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>IP</th>
+                                    <th>端口号</th>
+                                    <th>链</th>
+                                    <th>状态</th>
+                                    <th>同步状态</th>
+                                    <th>操作</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -275,21 +266,22 @@ const App = () => {
                                     <tr><td colSpan={7} style={{ textAlign: 'center', color: '#aaa', padding: 32 }}>暂无节点数据</td></tr>
                                 ) : (
                                     nodes.map(node => (
-                                        <tr key={node.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                                            <td style={{ padding: 10 }}>{node.id}</td>
-                                            <td style={{ padding: 10 }}>{node.ip || '-'}</td>
-                                            <td style={{ padding: 10 }}>{node.port || '-'}</td>
-                                            <td style={{ padding: 10 }}>{node.chain}</td>
-                                            <td style={{ padding: 10 }}>
+                                        <tr key={node.id}>
+                                            <td>{node.id}</td>
+                                            <td>{node.ip || '-'}</td>
+                                            <td>{node.port || '-'}</td>
+                                            <td>{node.chain}</td>
+                                            <td>
                                                 <span style={{ display: 'inline-block', minWidth: 60, color: '#fff', background: statusColors[node.status] || '#d9d9d9', borderRadius: 4, padding: '2px 10px', textAlign: 'center' }}>{node.status}</span>
                                             </td>
-                                            <td style={{ padding: 10 }}>
+                                            <td>
                                                 <span style={{ display: 'inline-block', minWidth: 60, color: '#fff', background: syncColors[node.sync_status] || '#d9d9d9', borderRadius: 4, padding: '2px 10px', textAlign: 'center' }}>{node.sync_status}</span>
                                             </td>
-                                            <td style={{ padding: 10 }}>
+                                            <td>
                                                 <button
                                                     onClick={() => deleteNode(node.id)}
-                                                    style={{ background: '#f5222d', color: '#fff', border: 'none', borderRadius: 4, padding: '4px 14px', fontWeight: 500, cursor: 'pointer' }}
+                                                    className="btn-dark"
+                                                    style={{ background: '#f5222d', color: '#fff', border: 'none', borderRadius: 12, padding: '4px 14px', fontWeight: 500, cursor: 'pointer' }}
                                                     disabled={isLoading}
                                                 >删除</button>
                                             </td>
@@ -301,7 +293,7 @@ const App = () => {
                         {/* 添加节点弹窗 */}
                         {addNodeModal && (
                             <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.25)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <div style={{ background: '#fff', borderRadius: 8, padding: 32, minWidth: 320, boxShadow: '0 2px 8px #f0f1f2', position: 'relative' }}>
+                                <div className="modal-dark">
                                     <h3 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>添加节点</h3>
                                     <div style={{ marginBottom: 16 }}>
                                         <input
@@ -309,7 +301,8 @@ const App = () => {
                                             placeholder="IP"
                                             value={newNode.ip}
                                             onChange={e => setNewNode({ ...newNode, ip: e.target.value })}
-                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
                                             disabled={isLoading}
                                         />
                                         <input
@@ -317,7 +310,8 @@ const App = () => {
                                             placeholder="端口号"
                                             value={newNode.port}
                                             onChange={e => setNewNode({ ...newNode, port: e.target.value })}
-                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
                                             disabled={isLoading}
                                         />
                                         <input
@@ -325,19 +319,20 @@ const App = () => {
                                             placeholder="链（如 Ethereum）"
                                             value={newNode.chain}
                                             onChange={e => setNewNode({ ...newNode, chain: e.target.value })}
-                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
                                             disabled={isLoading}
                                         />
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
                                         <button
                                             onClick={() => setAddNodeModal(false)}
-                                            style={{ marginRight: 12, background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                            className="btn-dark"
                                             disabled={isLoading}
                                         >取消</button>
                                         <button
                                             onClick={addNode}
-                                            style={{ background: '#40a9ff', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                            className="btn-green"
                                             disabled={isLoading}
                                         >确定</button>
                                     </div>
@@ -347,7 +342,7 @@ const App = () => {
                         {/* 创建节点弹窗 */}
                         {createNodeModal && (
                             <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.25)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <div style={{ background: '#fff', borderRadius: 8, padding: 32, minWidth: 320, boxShadow: '0 2px 8px #f0f1f2', position: 'relative' }}>
+                                <div className="modal-dark">
                                     <h3 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>创建节点</h3>
                                     <div style={{ marginBottom: 16 }}>
                                         <input
@@ -355,7 +350,8 @@ const App = () => {
                                             placeholder="云"
                                             value={createNodeForm.cloud}
                                             onChange={e => setCreateNodeForm({ ...createNodeForm, cloud: e.target.value })}
-                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
                                             disabled={isLoading}
                                         />
                                         <input
@@ -363,19 +359,20 @@ const App = () => {
                                             placeholder="机器类型"
                                             value={createNodeForm.machineType}
                                             onChange={e => setCreateNodeForm({ ...createNodeForm, machineType: e.target.value })}
-                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
                                             disabled={isLoading}
                                         />
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
                                         <button
                                             onClick={() => setCreateNodeModal(false)}
-                                            style={{ marginRight: 12, background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                            className="btn-dark"
                                             disabled={isLoading}
                                         >取消</button>
                                         <button
                                             onClick={createNode}
-                                            style={{ background: '#52c41a', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                            className="btn-green"
                                             disabled={isLoading}
                                         >确定</button>
                                     </div>
@@ -385,7 +382,7 @@ const App = () => {
                     </div>
                 )}
                 {page === 'rpcs' && (
-                    <div style={{ background: '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px #f0f1f2' }}>
+                    <div className="card-dark">
                         <h2 style={{ fontSize: 22, fontWeight: 600, marginBottom: 24 }}>RPC 管理</h2>
                         {/* 你可以在这里继续美化 RPC 管理页面 */}
                         <div style={{ color: '#aaa', textAlign: 'center', padding: 64 }}>敬请期待...</div>

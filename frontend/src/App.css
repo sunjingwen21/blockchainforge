@@ -1,3 +1,151 @@
+body {
+  background: #181A20;
+  color: #fff;
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+}
+
+/* 侧边栏 */
+.sider-dark {
+  background: #181A20;
+  color: #fff;
+  min-height: 100vh;
+  box-shadow: 2px 0 8px #101014;
+}
+.sider-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  border-bottom: 1px solid #232b3b;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.sider-menu-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0 32px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #8B949E;
+  border-left: 4px solid transparent;
+  transition: all 0.2s;
+  border-radius: 0 24px 24px 0;
+}
+.sider-menu-item.active {
+  background: #23262F;
+  color: #181A20;
+  border-left: 4px solid #C6FF4A;
+  font-weight: 700;
+}
+.sider-menu-item .icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+/* 卡片/表格/弹窗 */
+.card-dark {
+  background: #23262F;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 2px 8px #101014;
+  color: #fff;
+}
+.table-dark {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #23262F;
+  border-radius: 24px;
+  overflow: hidden;
+  color: #fff;
+}
+.table-dark th, .table-dark td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #232b3b;
+  text-align: left;
+}
+.table-dark th {
+  color: #8B949E;
+  background: #23262F;
+  font-weight: 600;
+}
+.table-dark tr:last-child td {
+  border-bottom: none;
+}
+
+/* 按钮 */
+.btn-dark {
+  background: #23262F;
+  color: #C6FF4A;
+  border: 1px solid #C6FF4A;
+  border-radius: 12px;
+  padding: 8px 24px;
+  font-weight: 600;
+  margin-right: 12px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.btn-dark:hover {
+  background: #C6FF4A;
+  color: #23262F;
+}
+.btn-green {
+  background: #C6FF4A;
+  color: #23262F;
+  border: none;
+}
+.btn-green:hover {
+  background: #fff;
+  color: #23262F;
+}
+
+/* 输入框 */
+.input-dark {
+  background: #181A20;
+  color: #fff;
+  border: 1px solid #232b3b;
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-right: 12px;
+}
+.input-dark:focus {
+  outline: none;
+  border-color: #C6FF4A;
+}
+
+/* 弹窗 */
+.modal-dark {
+  background: #23262F;
+  border-radius: 24px;
+  padding: 32px;
+  min-width: 320px;
+  box-shadow: 0 2px 8px #101014;
+  color: #fff;
+}
+
+/* 文字颜色 */
+.text-main {
+  color: #fff;
+}
+.text-secondary {
+  color: #8B949E;
+}
+
+/* 其他 */
+::-webkit-scrollbar {
+  width: 8px;
+  background: #23262F;
+}
+::-webkit-scrollbar-thumb {
+  background: #181A20;
+  border-radius: 8px;
+}
+
 .layout {
   min-height: 100vh;
 }
