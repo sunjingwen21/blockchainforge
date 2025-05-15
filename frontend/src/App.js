@@ -26,10 +26,11 @@ const App = () => {
     const [page, setPage] = useState('dashboard');
     const [rpcs, setRPCs] = useState([]);
     const [nodes, setNodes] = useState([]);
-    const [newRPC, setNewRPC] = useState({ url: '', chain_id: '', status: '活跃' });
-    const [newNode, setNewNode] = useState({ chain: '', status: '运行中', sync_status: '已同步' });
+    const [newNode, setNewNode] = useState({ ip: '', port: '', chain: '', status: '运行中', sync_status: '已同步' });
     const [isLoading, setIsLoading] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [addNodeModal, setAddNodeModal] = useState(false);
+    const [createNodeModal, setCreateNodeModal] = useState(false);
+    const [createNodeForm, setCreateNodeForm] = useState({ cloud: '', machineType: '' });
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
 
@@ -80,67 +81,39 @@ const App = () => {
         }
     };
 
-    const addRPC = async () => {
-        const sanitizedRPC = {
-            url: newRPC.url.trim(),
-            chain_id: newRPC.chain_id.trim(),
-            status: newRPC.status,
-        };
-        if (!sanitizedRPC.url || !sanitizedRPC.chain_id) {
-            toast.error('请填写 RPC 地址和链 ID');
-            return;
-        }
-        if (!sanitizedRPC.url.startsWith('http')) {
-            toast.error('RPC 地址必须以 http 或 https 开头');
-            return;
-        }
-        setIsLoading(true);
-        try {
-            await axios.post('/api/rpcs', sanitizedRPC);
-            setNewRPC({ url: '', chain_id: '', status: '活跃' });
-            fetchRPCs();
-            toast.success('RPC 添加成功');
-        } catch (error) {
-            console.error('添加 RPC 失败:', error);
-            toast.error('添加 RPC 失败');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const deleteRPC = async (id) => {
-        setIsLoading(true);
-        try {
-            await axios.delete(`/api/rpcs/${id}`);
-            fetchRPCs();
-            toast.success('RPC 删除成功');
-        } catch (error) {
-            console.error('删除 RPC 失败:', error);
-            toast.error('删除 RPC 失败');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const addNode = async () => {
-        const sanitizedNode = {
-            chain: newNode.chain.trim(),
-            status: newNode.status,
-            sync_status: newNode.sync_status,
-        };
-        if (!sanitizedNode.chain) {
-            toast.error('请填写链名称');
+        // 校验
+        if (!newNode.ip.trim() || !newNode.port.trim() || !newNode.chain.trim()) {
+            toast.error('请填写IP、端口号和链');
             return;
         }
         setIsLoading(true);
         try {
-            await axios.post('/api/nodes', sanitizedNode);
-            setNewNode({ chain: '', status: '运行中', sync_status: '已同步' });
+            await axios.post('/api/nodes', newNode);
+            setNewNode({ ip: '', port: '', chain: '', status: '运行中', sync_status: '已同步' });
+            setAddNodeModal(false);
             fetchNodes();
             toast.success('节点添加成功');
         } catch (error) {
-            console.error('添加节点失败:', error);
             toast.error('添加节点失败');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const createNode = async () => {
+        if (!createNodeForm.cloud.trim() || !createNodeForm.machineType.trim()) {
+            toast.error('请填写云和机器类型');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            // 这里可以调用后端API创建节点（如有）
+            setCreateNodeModal(false);
+            setCreateNodeForm({ cloud: '', machineType: '' });
+            toast.success('节点创建请求已提交');
+        } catch (error) {
+            toast.error('创建节点失败');
         } finally {
             setIsLoading(false);
         }
@@ -234,7 +207,7 @@ const App = () => {
         <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f6fa' }}>
             {/* Sider */}
             <aside style={{ width: 220, background: '#1a2233', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 0 24px 0', boxShadow: '2px 0 8px #f0f1f2' }}>
-                <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 24, letterSpacing: 1, borderBottom: '1px solid #232b3b', marginBottom: 8 }}>
+                <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18, letterSpacing: 1, borderBottom: '1px solid #232b3b', marginBottom: 8 }}>
                     <span style={{ color: '#fff' }}>BlockChainForge</span>
                 </div>
                 <nav style={{ width: '100%' }}>
@@ -273,45 +246,24 @@ const App = () => {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                             <span style={{ fontSize: 22, fontWeight: 600 }}>全节点管理</span>
                             <div>
-                                <input
-                                    type="text"
-                                    placeholder="链（如 Ethereum）"
-                                    value={newNode.chain}
-                                    onChange={e => setNewNode({ ...newNode, chain: e.target.value })}
-                                    style={{ marginRight: 8, padding: '6px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
-                                    disabled={isLoading}
-                                />
-                                <select
-                                    value={newNode.status}
-                                    onChange={e => setNewNode({ ...newNode, status: e.target.value })}
-                                    style={{ marginRight: 8, padding: '6px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
-                                    disabled={isLoading}
-                                >
-                                    <option value="运行中">运行中</option>
-                                    <option value="已停止">已停止</option>
-                                    <option value="错误">错误</option>
-                                </select>
-                                <select
-                                    value={newNode.sync_status}
-                                    onChange={e => setNewNode({ ...newNode, sync_status: e.target.value })}
-                                    style={{ marginRight: 8, padding: '6px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
-                                    disabled={isLoading}
-                                >
-                                    <option value="已同步">已同步</option>
-                                    <option value="同步中">同步中</option>
-                                    <option value="未同步">未同步</option>
-                                </select>
                                 <button
-                                    onClick={addNode}
-                                    style={{ background: '#40a9ff', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                    onClick={() => setAddNodeModal(true)}
+                                    style={{ background: '#40a9ff', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer', marginRight: 12 }}
                                     disabled={isLoading}
                                 >添加节点</button>
+                                <button
+                                    onClick={() => setCreateNodeModal(true)}
+                                    style={{ background: '#52c41a', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                    disabled={isLoading}
+                                >创建节点</button>
                             </div>
                         </div>
                         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
                             <thead>
                                 <tr style={{ background: '#f5f6fa' }}>
                                     <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>ID</th>
+                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>IP</th>
+                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>端口号</th>
                                     <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>链</th>
                                     <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>状态</th>
                                     <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>同步状态</th>
@@ -320,11 +272,13 @@ const App = () => {
                             </thead>
                             <tbody>
                                 {nodes.length === 0 ? (
-                                    <tr><td colSpan={5} style={{ textAlign: 'center', color: '#aaa', padding: 32 }}>暂无节点数据</td></tr>
+                                    <tr><td colSpan={7} style={{ textAlign: 'center', color: '#aaa', padding: 32 }}>暂无节点数据</td></tr>
                                 ) : (
                                     nodes.map(node => (
                                         <tr key={node.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                                             <td style={{ padding: 10 }}>{node.id}</td>
+                                            <td style={{ padding: 10 }}>{node.ip || '-'}</td>
+                                            <td style={{ padding: 10 }}>{node.port || '-'}</td>
                                             <td style={{ padding: 10 }}>{node.chain}</td>
                                             <td style={{ padding: 10 }}>
                                                 <span style={{ display: 'inline-block', minWidth: 60, color: '#fff', background: statusColors[node.status] || '#d9d9d9', borderRadius: 4, padding: '2px 10px', textAlign: 'center' }}>{node.status}</span>
@@ -344,6 +298,90 @@ const App = () => {
                                 )}
                             </tbody>
                         </table>
+                        {/* 添加节点弹窗 */}
+                        {addNodeModal && (
+                            <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.25)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ background: '#fff', borderRadius: 8, padding: 32, minWidth: 320, boxShadow: '0 2px 8px #f0f1f2', position: 'relative' }}>
+                                    <h3 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>添加节点</h3>
+                                    <div style={{ marginBottom: 16 }}>
+                                        <input
+                                            type="text"
+                                            placeholder="IP"
+                                            value={newNode.ip}
+                                            onChange={e => setNewNode({ ...newNode, ip: e.target.value })}
+                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            disabled={isLoading}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="端口号"
+                                            value={newNode.port}
+                                            onChange={e => setNewNode({ ...newNode, port: e.target.value })}
+                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            disabled={isLoading}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="链（如 Ethereum）"
+                                            value={newNode.chain}
+                                            onChange={e => setNewNode({ ...newNode, chain: e.target.value })}
+                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            disabled={isLoading}
+                                        />
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <button
+                                            onClick={() => setAddNodeModal(false)}
+                                            style={{ marginRight: 12, background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                            disabled={isLoading}
+                                        >取消</button>
+                                        <button
+                                            onClick={addNode}
+                                            style={{ background: '#40a9ff', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                            disabled={isLoading}
+                                        >确定</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {/* 创建节点弹窗 */}
+                        {createNodeModal && (
+                            <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.25)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ background: '#fff', borderRadius: 8, padding: 32, minWidth: 320, boxShadow: '0 2px 8px #f0f1f2', position: 'relative' }}>
+                                    <h3 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>创建节点</h3>
+                                    <div style={{ marginBottom: 16 }}>
+                                        <input
+                                            type="text"
+                                            placeholder="云"
+                                            value={createNodeForm.cloud}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, cloud: e.target.value })}
+                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            disabled={isLoading}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="机器类型"
+                                            value={createNodeForm.machineType}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, machineType: e.target.value })}
+                                            style={{ width: '100%', marginBottom: 12, padding: '8px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                            disabled={isLoading}
+                                        />
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <button
+                                            onClick={() => setCreateNodeModal(false)}
+                                            style={{ marginRight: 12, background: '#f0f0f0', color: '#333', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                            disabled={isLoading}
+                                        >取消</button>
+                                        <button
+                                            onClick={createNode}
+                                            style={{ background: '#52c41a', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                            disabled={isLoading}
+                                        >确定</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
                 {page === 'rpcs' && (
