@@ -3,6 +3,24 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Chart from 'chart.js/auto';
+import './App.css';
+
+const menuItems = [
+    { key: 'dashboard', icon: '📊', label: '仪表盘' },
+    { key: 'rpcs', icon: '🔗', label: 'RPC 管理' },
+    { key: 'nodes', icon: '🗄️', label: '全节点管理' },
+];
+
+const statusColors = {
+    '运行中': '#52c41a',
+    '已停止': '#f5222d',
+    '错误': '#faad14',
+};
+const syncColors = {
+    '已同步': '#1890ff',
+    '同步中': '#faad14',
+    '未同步': '#f5222d',
+};
 
 const App = () => {
     const [page, setPage] = useState('dashboard');
@@ -213,55 +231,129 @@ const App = () => {
     };
 
     return (
-        <div className="flex min-h-screen">
-            <div
-                className={`fixed inset-y-0 left-0 w-64 max-w-xs sidebar transform ${
-                    isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                } md:static md:transform-none md:w-1/5 transition-transform duration-200 z-50`}
-            >
-                <h1 className="text-2xl font-bold mb-6">BlockChainForge</h1>
-                <ul>
-                    <li
-                        className={`cursor-pointer rounded ${page === 'dashboard' ? 'active' : ''}`}
-                        onClick={() => {
-                            setPage('dashboard');
-                            setIsSidebarOpen(false);
-                        }}
-                    >
-                        仪表盘
-                    </li>
-                    <li
-                        className={`cursor-pointer rounded ${page === 'rpcs' ? 'active' : ''}`}
-                        onClick={() => {
-                            setPage('rpcs');
-                            setIsSidebarOpen(false);
-                        }}
-                    >
-                        RPC 管理
-                    </li>
-                    <li
-                        className={`cursor-pointer rounded ${page === 'nodes' ? 'active' : ''}`}
-                        onClick={() => {
-                            setPage('nodes');
-                            setIsSidebarOpen(false);
-                        }}
-                    >
-                        全节点管理
-                    </li>
-                </ul>
-            </div>
-            <div className="content">
-
+        <div style={{ display: 'flex', minHeight: '100vh', background: '#f5f6fa' }}>
+            {/* Sider */}
+            <aside style={{ width: 220, background: '#1a2233', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 0 24px 0', boxShadow: '2px 0 8px #f0f1f2' }}>
+                <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 24, letterSpacing: 1, borderBottom: '1px solid #232b3b', marginBottom: 8 }}>
+                    <span style={{ color: '#fff' }}>BlockChainForge</span>
+                </div>
+                <nav style={{ width: '100%' }}>
+                    {menuItems.map(item => (
+                        <div
+                            key={item.key}
+                            onClick={() => setPage(item.key)}
+                            style={{
+                                display: 'flex', alignItems: 'center', cursor: 'pointer',
+                                padding: '0 32px', height: 48, fontSize: 16, fontWeight: 500,
+                                background: page === item.key ? '#232b3b' : 'none',
+                                color: page === item.key ? '#40a9ff' : '#fff',
+                                borderLeft: page === item.key ? '4px solid #40a9ff' : '4px solid transparent',
+                                transition: 'all 0.2s',
+                            }}
+                        >
+                            <span style={{ fontSize: 20, marginRight: 12 }}>{item.icon}</span>
+                            {item.label}
+                        </div>
+                    ))}
+                </nav>
+            </aside>
+            {/* Content */}
+            <main style={{ flex: 1, minHeight: '100vh', background: '#f5f6fa', padding: '32px 40px' }}>
                 {isLoading && <div style={{ textAlign: 'center', color: '#4b5563' }}>加载中...</div>}
                 {page === 'dashboard' && (
-                    <div>
-                        <h2 className="text-xl font-bold mb-4">仪表盘</h2>
-                        <div style={{ height: '400px', width: '100%' }}>
+                    <div style={{ background: '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px #f0f1f2' }}>
+                        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>仪表盘</h2>
+                        <div style={{ height: 400, width: '100%' }}>
                             <canvas ref={chartRef}></canvas>
                         </div>
                     </div>
                 )}
-            </div>
+                {page === 'nodes' && (
+                    <div style={{ background: '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px #f0f1f2' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                            <span style={{ fontSize: 22, fontWeight: 600 }}>全节点管理</span>
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder="链（如 Ethereum）"
+                                    value={newNode.chain}
+                                    onChange={e => setNewNode({ ...newNode, chain: e.target.value })}
+                                    style={{ marginRight: 8, padding: '6px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                    disabled={isLoading}
+                                />
+                                <select
+                                    value={newNode.status}
+                                    onChange={e => setNewNode({ ...newNode, status: e.target.value })}
+                                    style={{ marginRight: 8, padding: '6px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                    disabled={isLoading}
+                                >
+                                    <option value="运行中">运行中</option>
+                                    <option value="已停止">已停止</option>
+                                    <option value="错误">错误</option>
+                                </select>
+                                <select
+                                    value={newNode.sync_status}
+                                    onChange={e => setNewNode({ ...newNode, sync_status: e.target.value })}
+                                    style={{ marginRight: 8, padding: '6px 12px', borderRadius: 4, border: '1px solid #d9d9d9' }}
+                                    disabled={isLoading}
+                                >
+                                    <option value="已同步">已同步</option>
+                                    <option value="同步中">同步中</option>
+                                    <option value="未同步">未同步</option>
+                                </select>
+                                <button
+                                    onClick={addNode}
+                                    style={{ background: '#40a9ff', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 18px', fontWeight: 500, cursor: 'pointer' }}
+                                    disabled={isLoading}
+                                >添加节点</button>
+                            </div>
+                        </div>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff' }}>
+                            <thead>
+                                <tr style={{ background: '#f5f6fa' }}>
+                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>ID</th>
+                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>链</th>
+                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>状态</th>
+                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>同步状态</th>
+                                    <th style={{ padding: 10, borderBottom: '1px solid #f0f0f0', textAlign: 'left' }}>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {nodes.length === 0 ? (
+                                    <tr><td colSpan={5} style={{ textAlign: 'center', color: '#aaa', padding: 32 }}>暂无节点数据</td></tr>
+                                ) : (
+                                    nodes.map(node => (
+                                        <tr key={node.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                                            <td style={{ padding: 10 }}>{node.id}</td>
+                                            <td style={{ padding: 10 }}>{node.chain}</td>
+                                            <td style={{ padding: 10 }}>
+                                                <span style={{ display: 'inline-block', minWidth: 60, color: '#fff', background: statusColors[node.status] || '#d9d9d9', borderRadius: 4, padding: '2px 10px', textAlign: 'center' }}>{node.status}</span>
+                                            </td>
+                                            <td style={{ padding: 10 }}>
+                                                <span style={{ display: 'inline-block', minWidth: 60, color: '#fff', background: syncColors[node.sync_status] || '#d9d9d9', borderRadius: 4, padding: '2px 10px', textAlign: 'center' }}>{node.sync_status}</span>
+                                            </td>
+                                            <td style={{ padding: 10 }}>
+                                                <button
+                                                    onClick={() => deleteNode(node.id)}
+                                                    style={{ background: '#f5222d', color: '#fff', border: 'none', borderRadius: 4, padding: '4px 14px', fontWeight: 500, cursor: 'pointer' }}
+                                                    disabled={isLoading}
+                                                >删除</button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                {page === 'rpcs' && (
+                    <div style={{ background: '#fff', borderRadius: 8, padding: 32, boxShadow: '0 2px 8px #f0f1f2' }}>
+                        <h2 style={{ fontSize: 22, fontWeight: 600, marginBottom: 24 }}>RPC 管理</h2>
+                        {/* 你可以在这里继续美化 RPC 管理页面 */}
+                        <div style={{ color: '#aaa', textAlign: 'center', padding: 64 }}>敬请期待...</div>
+                    </div>
+                )}
+            </main>
             <ToastContainer position="top-right" autoClose={3000} />
         </div>
     );
