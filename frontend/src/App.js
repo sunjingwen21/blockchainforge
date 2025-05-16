@@ -198,21 +198,6 @@ const App = () => {
                             color: 'rgba(255,255,255,0.08)',
                         },
                     },
-                    x: {
-                        title: {
-                            display: true,
-                            text: '状态',
-                            color: '#fff',
-                            font: { size: 16, weight: 'bold' },
-                        },
-                        ticks: {
-                            color: '#fff',
-                            font: { size: 14 },
-                        },
-                        grid: {
-                            color: 'rgba(255,255,255,0.08)',
-                        },
-                    },
                 },
                 plugins: {
                     legend: {
