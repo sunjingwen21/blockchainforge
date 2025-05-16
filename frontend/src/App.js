@@ -4,11 +4,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Chart from 'chart.js/auto';
 import './App.css';
+import { AiOutlineBarChart, AiOutlineLink, AiOutlineDatabase } from 'react-icons/ai';
 
 const menuItems = [
-    { key: 'dashboard', icon: '📊', label: '仪表盘' },
-    { key: 'rpcs', icon: '🔗', label: 'RPC 管理' },
-    { key: 'nodes', icon: '🗄️', label: '全节点管理' },
+    { key: 'dashboard', icon: <AiOutlineBarChart />, label: '仪表盘' },
+    { key: 'rpcs', icon: <AiOutlineLink />, label: 'RPC 管理' },
+    { key: 'nodes', icon: <AiOutlineDatabase />, label: '全节点管理' },
 ];
 
 const statusColors = {
@@ -216,7 +217,7 @@ const App = () => {
                             className={`sider-menu-item${page === item.key ? ' active' : ''}`}
                         >
                             <span className="icon">{item.icon}</span>
-                            {item.label}
+                            <span style={{ color: '#fff' }}>{item.label}</span>
                         </div>
                     ))}
                 </nav>

@@ -42,7 +42,7 @@ body {
   height: 48px;
   font-size: 16px;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--text-main);
   border-left: 4px solid transparent;
   transition: all 0.2s;
   border-radius: 0 24px 24px 0;
@@ -50,13 +50,10 @@ body {
 }
 .sider-menu-item.active {
   background: var(--highlight);
-  color: var(--main-dark);
+  color: #fff;
   border-left: 4px solid var(--highlight);
   font-weight: 700;
   box-shadow: 0 2px 8px #C6FF4A33;
-}
-.sider-menu-item.active .icon {
-  color: var(--main-dark);
 }
 .sider-menu-item .icon {
   font-size: 20px;
@@ -65,7 +62,7 @@ body {
   transition: color 0.2s;
 }
 .sider-menu-item.active .icon {
-  color: var(--main-dark);
+  color: #fff;
 }
 .sider-menu-item:hover {
   background: #23262F;
@@ -82,6 +79,9 @@ body {
   padding: 32px;
   box-shadow: var(--shadow);
   color: var(--text-main);
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
 .table-dark {
   width: 100%;
