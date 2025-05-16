@@ -11,11 +11,16 @@ import (
 )
 
 type CreateMachineRequest struct {
-	Region string `json:"region"`
-	MachineType string `json:"machine_type"`
-	ImageName string `json:"image_name"`
-	DiskType string `json:"disk_type"`
-	DiskSize string `json:"disk_size"`
+	CloudType    string `json:"cloudType"`
+	Region       string `json:"region"`
+	MachineType  string `json:"machineType"`
+	ImageName    string `json:"imageName"`
+	DiskType     string `json:"diskType"`
+	DiskSize     string `json:"diskSize"`
+	MachineName  string `json:"machineName"`
+	VpcName      string `json:"vpcName"`
+	SubscriptionId string `json:"subscriptionId"`
+	Project      string `json:"project"`
 }
 
 var taskStatusMap = make(map[string]map[string]interface{}) // taskId -> {status, ip, error}
