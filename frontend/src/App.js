@@ -109,10 +109,26 @@ const App = () => {
         }
         setIsLoading(true);
         try {
-            // 这里可以调用后端API创建节点（如有）
-            setCreateNodeModal(false);
-            setCreateNodeForm({ cloud: '', machineType: '' });
-            toast.success('节点创建请求已提交');
+            const res = await fetch('/api/create-machine', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    project: createNodeForm.projectName,
+                    vpcName: createNodeForm.vpcName,
+                    region: createNodeForm.region,
+                    machineType: createNodeForm.machineType,
+                    zone: createNodeForm.zone,
+                    cloudType: createNodeForm.cloudType,
+                    subscriptionId: createNodeForm.subscriptionId,
+                })
+            });
+            const data = await res.json();
+            if (data.success && data.taskId) {
+                toast.info('节点创建中，请稍候...');
+                checkStatus(data.taskId); // 开始轮询
+            } else {
+                toast.error('创建任务提交失败: ' + (data.error || data.msg));
+            }
         } catch (error) {
             toast.error('创建节点失败');
         } finally {
@@ -228,6 +244,22 @@ const App = () => {
                 },
             },
         });
+    };
+
+    const checkStatus = async (taskId) => {
+        const res = await fetch(`/api/task-status?id=${taskId}`);
+        const data = await res.json();
+        if (data.status === 'done') {
+            toast.success('节点创建成功，IP: ' + data.ip);
+            setCreateNodeModal(false);
+            setCreateNodeForm({ cloud: '', machineType: '' });
+        } else if (data.status === 'failed') {
+            toast.error('节点创建失败: ' + data.error);
+            setCreateNodeModal(false);
+            setCreateNodeForm({ cloud: '', machineType: '' });
+        } else {
+            setTimeout(() => checkStatus(taskId), 2000); // 2秒后再查
+        }
     };
 
     return (
@@ -381,11 +413,85 @@ const App = () => {
                                             style={{ width: '100%', marginBottom: 12 }}
                                             disabled={isLoading}
                                         />
+                                        {/* 项目名称描述 */}
+                                        <div style={{ color: '#8B949E', fontSize: 14, marginBottom: 4 }}>
+                                            项目名称用于标识云资源所属的 GCP/AWS 项目，请填写正确的项目 ID。
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="项目名称"
+                                            value={createNodeForm.projectName}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, projectName: e.target.value })}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
+                                            disabled={isLoading}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="SubscriptionId"
+                                            value={createNodeForm.subscriptionId}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, subscriptionId: e.target.value })}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
+                                            disabled={isLoading}
+                                        />
+                                        {/* 区域描述 */}
+                                        <div style={{ color: '#8B949E', fontSize: 14, marginBottom: 4 }}>
+                                            区域用于标识云资源所属的 Azure 区域，请填写正确的区域。
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="区域"
+                                            value={createNodeForm.region}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, region: e.target.value })}
+                                            style={{ width: '100%', marginBottom: 12 }}
+                                            disabled={isLoading}
+                                        />
                                         <input
                                             type="text"
                                             placeholder="机器类型"
                                             value={createNodeForm.machineType}
-                                            onChange={e => setCreateNodeForm({ ...createNodeForm, machineType: e.target.value })}
+                                            style={{ width: '100%', marginBottom: 12 }}
+                                            disabled={isLoading}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="镜像名称"
+                                            value={createNodeForm.imageName}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, imageName: e.target.value })}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
+                                            disabled={isLoading}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="机器名称"
+                                            value={createNodeForm.machineName}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, machineName: e.target.value })}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
+                                            disabled={isLoading}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="磁盘类型"
+                                            value={createNodeForm.diskType}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, diskType: e.target.value })}
+                                            className="input-dark"
+                                            style={{ width: '100%', marginBottom: 12 }}
+                                            disabled={isLoading}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="磁盘大小"
+                                            value={createNodeForm.diskSize}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, diskSize: e.target.value })}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="vpc名称"
+                                            value={createNodeForm.vpcName}
+                                            onChange={e => setCreateNodeForm({ ...createNodeForm, vpcName: e.target.value })}
                                             className="input-dark"
                                             style={{ width: '100%', marginBottom: 12 }}
                                             disabled={isLoading}

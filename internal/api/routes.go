@@ -7,6 +7,7 @@ package api
 import (
 	"chainforge/internal/storage"
 	"github.com/gin-gonic/gin"
+	"chainforge/internal/machine"
 )
 
 func SetupRoutes(r *gin.Engine, db *storage.DB) {
@@ -25,5 +26,7 @@ func SetupRoutes(r *gin.Engine, db *storage.DB) {
 		api.GET("/nodes", GetNodes)
 		api.POST("/nodes", CreateNode)
 		api.DELETE("/nodes/:id", DeleteNode)
+		api.POST("/create-machine", machine.JudgeCloudType)
+		api.GET("/task-status", machine.TaskStatusHandler)
 	}
 }
