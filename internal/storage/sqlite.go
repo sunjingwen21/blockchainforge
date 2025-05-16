@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"chainforge/internal/models"
+	"blockchainforge/internal/models"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"

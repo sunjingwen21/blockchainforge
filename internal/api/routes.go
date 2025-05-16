@@ -5,9 +5,9 @@ Author: jw
 package api
 
 import (
-	"chainforge/internal/storage"
+	"blockchainforge/internal/storage"
 	"github.com/gin-gonic/gin"
-	"chainforge/internal/machine"
+	"blockchainforge/internal/machine"
 )
 
 func SetupRoutes(r *gin.Engine, db *storage.DB) {

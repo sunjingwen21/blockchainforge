@@ -1,9 +1,9 @@
 package main
 
 import (
-	"chainforge/config"
-	"chainforge/internal/api"
-	"chainforge/internal/storage"
+	"blockchainforge/config"
+	"blockchainforge/internal/api"
+	"blockchainforge/internal/storage"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"

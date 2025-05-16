@@ -1,8 +1,8 @@
 package api
 
 import (
-	"chainforge/internal/models"
-	"chainforge/internal/storage"
+	"blockchainforge/internal/models"
+	"blockchainforge/internal/storage"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"

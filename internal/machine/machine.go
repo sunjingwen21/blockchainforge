@@ -4,7 +4,7 @@ import (
         "github.com/aws/constructs-go/constructs/v10"
         "github.com/hashicorp/terraform-cdk-go/cdktf"
 		"github.com/gin-gonic/gin"
-		"chainforge/internal/logger"
+		"blockchainforge/internal/logger"
 		"github.com/google/uuid"
 		"net/http"
 		"time"
