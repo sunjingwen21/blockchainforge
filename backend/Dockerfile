@@ -6,7 +6,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-RUN CGO_ENABLED=1 GOOS=linux go build -o main ./cmd/server
+RUN CGO_ENABLED=1 GOOS=linux go build -v -x -o main ./cmd/server
 
 FROM ubuntu:22.04
 
