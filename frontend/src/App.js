@@ -205,10 +205,10 @@ const App = () => {
                         position: 'top',
                         labels: {
                             color: '#fff',
-                            font: { size: 16, weight: 'bold' },
-                            boxWidth: 24,
-                            boxHeight: 16,
-                            padding: 24,
+                            font: { size: 14, weight: 'bold' },
+                            boxWidth: 20,
+                            boxHeight: 14,
+                            padding: 16,
                         },
                     },
                     title: {
@@ -234,7 +234,7 @@ const App = () => {
         <div style={{ display: 'flex', minHeight: '100vh', background: '#181A20' }}>
             {/* Sider */}
             <aside className="sider-dark">
-                <div className="sider-logo">BlockChainForge</div>
+                <div className="sider-logo" style={{ marginTop: 32 }}>BlockChainForge</div>
                 <nav style={{ width: '100%' }}>
                     {menuItems.map(item => (
                         <div
@@ -254,7 +254,7 @@ const App = () => {
                 {page === 'dashboard' && (
                     <div className="card-dark dashboard-full">
                         <h2 style={{ fontSize: 24, fontWeight: 700, margin: '32px 0 0 40px', color: '#fff', letterSpacing: 1 }}>仪表盘</h2>
-                        <div style={{ flex: 1, height: '100%', width: '100%', padding: '0 40px 0 40px', boxSizing: 'border-box' }}>
+                        <div style={{ flex: 1, height: 'calc(100% - 80px)', width: '100%', padding: '0 40px 0 40px', boxSizing: 'border-box' }}>
                             <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
                         </div>
                     </div>
