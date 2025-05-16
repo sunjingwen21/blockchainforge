@@ -180,7 +180,7 @@ const App = () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                layout: { padding: { top: 32, left: 16, right: 16, bottom: 16 } },
+                layout: { padding: { top: 32, left: 0, right: 40, bottom: 0 } },
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -216,6 +216,7 @@ const App = () => {
                 },
                 plugins: {
                     legend: {
+                        align: 'end',
                         position: 'top',
                         labels: {
                             color: '#fff',
@@ -263,13 +264,13 @@ const App = () => {
                 </nav>
             </aside>
             {/* Content */}
-            <main style={{ flex: 1, minHeight: '100vh', background: '#181A20', padding: 0 }}>
+            <main style={{ flex: 1, minHeight: '100vh', background: '#181A20', padding: 0, margin: 0 }}>
                 {isLoading && <div style={{ textAlign: 'center', color: '#4b5563' }}>加载中...</div>}
                 {page === 'dashboard' && (
                     <div className="card-dark dashboard-full">
-                        <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 32, color: '#fff', letterSpacing: 1 }}>仪表盘</h2>
-                        <div style={{ height: 440, width: '100%' }}>
-                            <canvas ref={chartRef}></canvas>
+                        <h2 style={{ fontSize: 24, fontWeight: 700, margin: '32px 0 0 40px', color: '#fff', letterSpacing: 1 }}>仪表盘</h2>
+                        <div style={{ flex: 1, height: '100%', width: '100%', padding: '0 40px 0 40px', boxSizing: 'border-box' }}>
+                            <canvas ref={chartRef} style={{ width: '100%', height: '100%' }}></canvas>
                         </div>
                     </div>
                 )}

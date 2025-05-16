@@ -92,6 +92,9 @@ body {
   box-sizing: border-box;
   background: #23262F;
   box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 .table-dark {
   width: 100%;
