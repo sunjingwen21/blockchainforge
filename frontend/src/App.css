@@ -85,6 +85,19 @@ body {
 }
 .card-dark.dashboard-full {
   width: 100%;
+  height: 100vh;
+  border-radius: 0 32px 32px 0;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background: #23262F;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.card-dark.nodes-centered {
+  width: 100%;
   max-width: 1200px;
   min-height: 80vh;
   border-radius: 32px;
@@ -98,13 +111,13 @@ body {
   justify-content: flex-start;
 }
 @media (max-width: 1400px) {
-  .card-dark.dashboard-full {
+  .card-dark.nodes-centered {
     max-width: 96vw;
     padding: 0 8px 24px 8px;
   }
 }
 @media (max-width: 900px) {
-  .card-dark.dashboard-full {
+  .card-dark.nodes-centered {
     max-width: 100vw;
     padding: 0 2vw 16px 2vw;
     border-radius: 0;

@@ -275,7 +275,7 @@ const App = () => {
                     </div>
                 )}
                 {page === 'nodes' && (
-                    <div className="card-dark">
+                    <div className="card-dark nodes-centered">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                             <span style={{ fontSize: 22, fontWeight: 600 }}>全节点管理</span>
                             <div>
