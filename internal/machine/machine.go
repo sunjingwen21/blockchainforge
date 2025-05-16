@@ -156,6 +156,7 @@ func AzureMachine(request *CreateMachineRequest) (string, error) {
 		
 		app.Synth()
 	return computeInstance.NetworkInterface().Get(0).AccessConfig().Get(0).NatIp(), nil
+   }
 }
 
 func TaskStatusHandler(c *gin.Context) {
