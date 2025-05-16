@@ -160,44 +160,84 @@ const App = () => {
                     {
                         label: 'RPC 状态',
                         data: [rpcStatusCount['活跃'], rpcStatusCount['离线'], rpcStatusCount['故障'], 0, 0, 0],
-                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
+                        backgroundColor: '#4F8CFF',
+                        borderColor: '#4F8CFF',
                         borderWidth: 1,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.5,
                     },
                     {
                         label: '节点状态',
                         data: [0, 0, 0, nodeStatusCount['运行中'], nodeStatusCount['已停止'], nodeStatusCount['错误']],
-                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                        borderColor: 'rgba(16, 185, 129, 1)',
+                        backgroundColor: '#6DFFB3',
+                        borderColor: '#6DFFB3',
                         borderWidth: 1,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.5,
                     },
                 ],
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: { padding: { top: 32, left: 16, right: 16, bottom: 16 } },
                 scales: {
                     y: {
                         beginAtZero: true,
                         title: {
                             display: true,
                             text: '数量',
+                            color: '#fff',
+                            font: { size: 16, weight: 'bold' },
+                        },
+                        ticks: {
+                            color: '#fff',
+                            font: { size: 14 },
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.08)',
                         },
                     },
                     x: {
                         title: {
                             display: true,
                             text: '状态',
+                            color: '#fff',
+                            font: { size: 16, weight: 'bold' },
+                        },
+                        ticks: {
+                            color: '#fff',
+                            font: { size: 14 },
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.08)',
                         },
                     },
                 },
                 plugins: {
                     legend: {
                         position: 'top',
+                        labels: {
+                            color: '#fff',
+                            font: { size: 16, weight: 'bold' },
+                            boxWidth: 24,
+                            boxHeight: 16,
+                            padding: 24,
+                        },
                     },
                     title: {
                         display: true,
                         text: '状态分布图',
+                        color: '#fff',
+                        font: { size: 20, weight: 'bold' },
+                        padding: { top: 0, bottom: 24 },
+                    },
+                    tooltip: {
+                        backgroundColor: '#23262F',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#C6FF4A',
+                        borderWidth: 1,
                     },
                 },
             },
@@ -223,12 +263,12 @@ const App = () => {
                 </nav>
             </aside>
             {/* Content */}
-            <main style={{ flex: 1, minHeight: '100vh', background: '#181A20', padding: '32px 40px' }}>
+            <main style={{ flex: 1, minHeight: '100vh', background: '#181A20', padding: 0 }}>
                 {isLoading && <div style={{ textAlign: 'center', color: '#4b5563' }}>加载中...</div>}
                 {page === 'dashboard' && (
-                    <div className="card-dark">
-                        <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 24 }}>仪表盘</h2>
-                        <div style={{ height: 400, width: '100%' }}>
+                    <div className="card-dark dashboard-full">
+                        <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 32, color: '#fff', letterSpacing: 1 }}>仪表盘</h2>
+                        <div style={{ height: 440, width: '100%' }}>
                             <canvas ref={chartRef}></canvas>
                         </div>
                     </div>

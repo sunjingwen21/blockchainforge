@@ -83,6 +83,14 @@ body {
   height: 100%;
   margin: 0;
 }
+.card-dark.dashboard-full {
+  width: 100vw;
+  min-height: 100vh;
+  border-radius: 0 32px 32px 0;
+  margin: 0;
+  padding: 48px 48px 0 48px;
+  box-sizing: border-box;
+}
 .table-dark {
   width: 100%;
   border-collapse: separate;
