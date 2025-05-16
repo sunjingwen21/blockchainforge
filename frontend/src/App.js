@@ -261,8 +261,8 @@ const App = () => {
                 )}
                 {page === 'nodes' && (
                     <div className="card-dark nodes-centered">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                            <span style={{ fontSize: 22, fontWeight: 600 }}>全节点管理</span>
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: 24, gap: 16 }}>
+                            <span style={{ fontSize: 22, fontWeight: 600, marginRight: 32 }}>全节点管理</span>
                             <div>
                                 <button
                                     onClick={() => setAddNodeModal(true)}
@@ -276,16 +276,16 @@ const App = () => {
                                 >创建节点</button>
                             </div>
                         </div>
-                        <table className="table-dark">
+                        <table className="table-dark" style={{ width: '100%', fontSize: 16, lineHeight: '1.7' }}>
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>IP</th>
-                                    <th>端口号</th>
-                                    <th>链</th>
-                                    <th>状态</th>
-                                    <th>同步状态</th>
-                                    <th>操作</th>
+                                    <th style={{ fontWeight: 700, fontSize: 17 }}>ID</th>
+                                    <th style={{ fontWeight: 700, fontSize: 17 }}>IP</th>
+                                    <th style={{ fontWeight: 700, fontSize: 17 }}>端口号</th>
+                                    <th style={{ fontWeight: 700, fontSize: 17 }}>链</th>
+                                    <th style={{ fontWeight: 700, fontSize: 17 }}>状态</th>
+                                    <th style={{ fontWeight: 700, fontSize: 17 }}>同步状态</th>
+                                    <th style={{ fontWeight: 700, fontSize: 17 }}>操作</th>
                                 </tr>
                             </thead>
                             <tbody>
