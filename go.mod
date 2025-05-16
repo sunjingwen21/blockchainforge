@@ -1,4 +1,4 @@
-module chainforge
+module blockchainforge
 
 go 1.23
 
