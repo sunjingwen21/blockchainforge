@@ -1,0 +1,23 @@
+database_type: mysql
+mysql_host: mysql
+mysql_port: 3306
+mysql_user: root
+mysql_password: 123456
+mysql_dbname: blockchainforge
+machine_platform: gcp,aws,azure,aliyun,tencent
+#azure
+azureSubscriptionId:
+azureAccessKey:
+azureSecretKey:
+azureClientId:
+azureClientSecret:
+azureTenantId:
+#aws
+awsAccessKey:
+awsSecretKey:
+#aliyun
+aliyunAccessKey:
+aliyunSecretKey:
+#tencent
+tencentAccessKey:
+tencentSecretKey:
