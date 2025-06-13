@@ -1,20 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: chainforge
+  name: blockchainforge
+  namespace: blockchainforge
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: chainforge
+      app: blockchainforge
   template:
     metadata:
       labels:
-        app: chainforge
+        app: blockchainforge
     spec:
       containers:
-      - name: chainforge
-        image: chainforge:latest
+      - name: blockchainforge
+        image: blockchainforge:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         resources:
@@ -28,10 +30,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: chainforge
+  name: blockchainforge
 spec:
   selector:
-    app: chainforge
+    app: blockchainforge
   ports:
   - port: 80
     targetPort: 8080

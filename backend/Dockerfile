@@ -4,10 +4,10 @@ RUN apk add --no-cache git gcc musl-dev
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY . .
 RUN go mod download
 
-COPY . .
+
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -v -o main ./cmd/server
 
